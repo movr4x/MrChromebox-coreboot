@@ -83,3 +83,6 @@ config EDK2_GOP_FILE
 	default "3rdparty/blobs/soc/intel/cml/IntelGopDriver.efi" if SOC_INTEL_COMETLAKE || SOC_INTEL_WHISKEYLAKE
 	default "3rdparty/blobs/soc/intel/tgl/IntelGopDriver.efi" if SOC_INTEL_TIGERLAKE
 	default "IntelGopDriver.efi"
+
+config BOARD_GOOGLE_REX_COMMON
+	select FSP_TYPE_IOT
