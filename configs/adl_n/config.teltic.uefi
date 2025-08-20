@@ -1,6 +1,5 @@
 CONFIG_VENDOR_GOOGLE=y
 CONFIG_CBFS_SIZE=0x400000
-CONFIG_INTEL_GMA_HAVE_VBT=y
 CONFIG_INTEL_GMA_VBT_FILE="3rdparty/blobs/mainboard/google/brya/nissa/teltic/vbt.bin"
 CONFIG_MAINBOARD_SMBIOS_PRODUCT_NAME="Teltic"
 CONFIG_IFD_BIN_PATH="3rdparty/blobs/mainboard/google/brya/nissa/teltic/flashdescriptor.bin"
