@@ -37,6 +37,13 @@ static struct sm_obj_form ec = {
 		&ec_sw_sync,
 		&ec_rw_jump,
 		&auto_fan_control,
+#if CONFIG(CHROMEEC_LID_POWER_EVENTS)
+		&ec_lidpe_open_auto_on,
+		&ec_lidpe_closed_ignore_pb,
+#endif
+#if CONFIG(CHROMEEC_HIB_EC_ON_S4S5)
+		&ec_hib_on_s4s5,
+#endif
 		NULL
 	},
 };
