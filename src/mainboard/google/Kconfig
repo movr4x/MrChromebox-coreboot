@@ -28,7 +28,7 @@ config CHROMEEC_AFTER_G3_STATE
 	  configuration.
 
 	  After G3 State is updated from existing coreboot CFR:
-	    "Restore AC Power Loss"
+	    "Restore AC power after loss"
 
 	  Only useful for boards with dedicated 3V coin battery to sustain
 	  bbram, and only for EC images compiled with
