@@ -14,4 +14,74 @@ source "src/mainboard/google/*/Kconfig"
 config MAINBOARD_VENDOR
 	default "Google"
 
+if HAVE_POWER_STATE_AFTER_FAILURE
+
+config CHROMEEC_AFTER_G3_STATE
+	bool "Enable configuring ChromeEC After G3 State with CFR at boot"
+	default n
+	depends on EC_GOOGLE_CHROMEEC
+	depends on DRIVERS_OPTION_CFR_ENABLED
+	help
+	  Enable configuring ChromeEC After G3 State with CFR at boot via host
+	  command, otherwise ChromeEC default compiled after G3 behavior
+	  (usually "Previous State") will override coreboot after G3
+	  configuration.
+
+	  After G3 State is updated from existing coreboot CFR:
+	    "Restore AC Power Loss"
+
+	  Only useful for boards with dedicated 3V coin battery to sustain
+	  bbram, and only for EC images compiled with
+	  CONFIG_POWER_BUTTON_INIT_IDLE, as this ensures that OFF bbram reset
+	  flags are retained.
+
+	  This option has no effect if ChromeEC running image does not support
+	  custom host command EC_CMD_AFTER_G3_STATE.
+
+endif # HAVE_POWER_STATE_AFTER_FAILURE
+
+config CHROMEEC_LID_POWER_EVENTS
+	bool "Enable configuring ChromeEC Lid Power Events with CFR at boot"
+	default n
+	depends on EC_GOOGLE_CHROMEEC
+	depends on DRIVERS_OPTION_CFR_ENABLED
+	help
+	  Enable configuring ChromeEC Lid Power Events with CFR at boot via
+	  host command, otherwise ChromeEC default compiled lid power related
+	  behavior will be used.
+
+	  Only useful for boards with EC images compiled with/without specific
+	  configs:
+	    - With CONFIG_LID_SWITCH - device will auto power on when user
+	      opens lid.
+	    - Without CONFIG_POWER_BUTTON_IGNORE_LID - device will remain off
+	      when user presses power button while lid is closed.
+
+	  This option has no effect if ChromeEC running image does not support
+	  custom host command EC_CMD_LID_POWER_EVENTS.
+
+config CHROMEEC_HIB_EC_ON_S4S5
+	bool "Enable configuring ChromeEC hibernation on S4/S5 with CFR at boot"
+	default n
+	depends on EC_GOOGLE_CHROMEEC
+	depends on DRIVERS_OPTION_CFR_ENABLED
+	help
+	  Enable configuring ChromeEC hibernation on S4/S5 with CFR at boot via
+	  host command, otherwise ChromeEC default compiled EC hibernating
+	  behavior will be used.
+
+	  Only useful for boards with internal batteries, allowing to reduce
+	  battery usage when device remains off.
+
+	  Hibernation is put on hold while external power is plugged.
+
+	  Waking up EC from hibernation always boots RO image first. If EC does
+	  not auto jump RO->RW at EC boot (no HW-WP enabled and/or failed RW
+	  signature verification), then image will stay in RO until manual jump
+	  is performed (coreboot, console, ectool). Device will always auto
+	  power on.
+
+	  This option has no effect if ChromeEC running image does not support
+	  custom host command EC_CMD_HIB_EC_ON_S4S5.
+
 endif # VENDOR_GOOGLE

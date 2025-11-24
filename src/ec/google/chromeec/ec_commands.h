@@ -8940,6 +8940,118 @@ struct ec_response_get_boot_time {
 #define EC_CMD_AP_SHUTDOWN 0x0605
 
 /*****************************************************************************/
+/* Custom power related commands: range 0x3AC0-0x3ACF */
+
+/* Set and/or get After G3 State value. */
+#define EC_CMD_AFTER_G3_STATE 0x3AC0
+
+enum ec_after_g3_state {
+	/* Unknown state. */
+	EC_AFTER_G3_STATE_UNKNOWN = 0,
+	/* After restoring power device should always stay off. */
+	EC_AFTER_G3_STATE_OFF,
+	/* After restoring power device should always auto power on. */
+	EC_AFTER_G3_STATE_ON,
+	/* After restoring power device should only stay off if power was lost
+	 * after graceful shutdown, otherwise it should auto power on.
+	 */
+	EC_AFTER_G3_STATE_PREVIOUS,
+
+	/* Special Values */
+
+	/* Make the command act as a getter only. */
+	EC_AFTER_G3_STATE_GET = 100,
+	/* Used for response only. Indicates internal command error. */
+	EC_AFTER_G3_STATE_ERROR
+};
+
+/**
+ * struct ec_params_after_g3_state - Parameters to the After G3 State command.
+ * @set_state: Set After G3 State value. Passing EC_AFTER_G3_STATE_GET makes
+ *             the command act as a getter only.
+ */
+struct ec_params_after_g3_state {
+	uint8_t set_state; /* enum ec_after_g3_state */
+} __ec_align1;
+
+/**
+ * struct ec_response_after_g3_state - Response to the After G3 State command.
+ * @cur_state: Current After G3 State value. EC_AFTER_G3_STATE_ERROR indicates
+ *             command failure to set/get value.
+ */
+struct ec_response_after_g3_state {
+	uint8_t cur_state; /* enum ec_after_g3_state */
+} __ec_align1;
+
+/* Set and/or get Lid Power Events flags. */
+#define EC_CMD_LID_POWER_EVENTS 0x3AC1
+
+enum ec_lid_power_events_flags {
+	/* Disable auto power on when user opens lid. */
+	EC_LID_POWER_EVENTS_NO_OPEN_AUTO_ON       = (1 << 0),
+	/* Disable ignoring power button while lid is closed. */
+	EC_LID_POWER_EVENTS_NO_CLOSED_IGNORE_PB   = (1 << 1),
+
+	/* Special Flags (regular flags will always override defaults) */
+
+	/* Default flag is always at position +8 in relation to non-default. */
+	/* Restore default for EC_LID_POWER_EVENTS_NO_OPEN_AUTO_ON. */
+	EC_LID_POWER_EVENTS_DEF_OPEN_AUTO_ON      = (1 << 8),
+	/* Restore default for EC_LID_POWER_EVENTS_NO_CLOSED_IGNORE_PB. */
+	EC_LID_POWER_EVENTS_DEF_CLOSED_IGNORE_PB  = (1 << 9),
+
+	/* Restore all lid power events to default. */
+	EC_LID_POWER_EVENTS_DEFAULT               = (1 << 24),
+	/* Make the command act as a getter only (other flags are ignored). */
+	EC_LID_POWER_EVENTS_GET                   = (1 << 25),
+	/* Used for response only. Indicates internal command error. */
+	EC_LID_POWER_EVENTS_ERROR                 = (1 << 26)
+};
+
+/**
+ * struct ec_params_lid_power_events - Parameters to the Lid Power Events
+ * command.
+ * @set_lpe_flags: Set Lid Power Events flags. Passing EC_LID_POWER_EVENTS_GET
+ *                 makes the command act as a getter only.
+ */
+struct ec_params_lid_power_events {
+	uint32_t set_lpe_flags; /* enum ec_lid_power_events_flags */
+} __ec_align4;
+
+/**
+ * struct ec_response_lid_power_events - Response to the Lid Power Events
+ * command.
+ * @cur_lpe_flags: Current Lid Power Events flags. EC_LID_POWER_EVENTS_ERROR
+ *                 indicates command failure to set/get flags.
+ */
+struct ec_response_lid_power_events {
+	uint32_t cur_lpe_flags; /* enum ec_lid_power_events_flags */
+} __ec_align4;
+
+/* Set and/or get EC hibernation policy on S4/S5. */
+#define EC_CMD_HIB_EC_ON_S4S5 0x3AC2
+
+/**
+ * struct ec_params_hib_ec_on_s4s5 - Parameters to the Hibernate EC On S4/S5
+ * command.
+ * @set_enabled: Set EC hibernation policy on S4/S5. Passing value < 0 makes the
+ *               command act as a getter only.
+ */
+struct ec_params_hib_ec_on_s4s5 {
+	int8_t set_enabled;
+} __ec_align1;
+
+/**
+ * struct ec_response_after_g3_state - Response to the Hibernate EC On S4/S5
+ * command.
+ * @cur_enabled: Current EC hibernation policy on S4/S5. Value < 0 indicates
+ *               command failure to set/get value.
+ */
+struct ec_response_hib_ec_on_s4s5 {
+	int8_t cur_enabled;
+} __ec_align1;
+
+/*****************************************************************************/
 /*
  * Reserve a range of host commands for board-specific, experimental, or
  * special purpose features. These can be (re)used without updating this file.

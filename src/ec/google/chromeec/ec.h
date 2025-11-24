@@ -505,6 +505,49 @@ const char *google_chromeec_acpi_name(const struct device *dev);
 
 #endif /* HAVE_ACPI_TABLES */
 
+#if CONFIG(CHROMEEC_AFTER_G3_STATE)
+/**
+ * Set and/or get After G3 State value.
+ *
+ * @param set_state      Set After G3 State value. Passing EC_AFTER_G3_STATE_GET
+ *                       makes the command act as a getter only.
+ * @param *out_cur_state Optional pointer to store retrieved current After G3
+ *                       State value.
+ * @return               0 on success, -1 on error.
+ */
+
+int google_chromeec_after_g3_state(enum ec_after_g3_state set_state,
+		enum ec_after_g3_state *out_cur_state);
+#endif /* CHROMEEC_AFTER_G3_STATE */
+
+#if CONFIG(CHROMEEC_LID_POWER_EVENTS)
+/**
+ * Set and/or get Lid Power Events flags.
+ *
+ * @param set_lpe_flags      Set Lid Power Events flags. Passing
+ *                           EC_LID_POWER_EVENTS_GET makes the command act as a
+ *                           getter only.
+ * @param *out_cur_lpe_flags Optional pointer to store retrieved current Lid
+ *                           Power Events flags.
+ * @return                   0 on success, -1 on error.
+ */
+int google_chromeec_lid_power_events(uint32_t set_lpe_flags,
+		uint32_t *out_cur_lpe_flags);
+#endif /* CHROMEEC_LID_POWER_EVENTS */
+
+#if CONFIG(CHROMEEC_HIB_EC_ON_S4S5)
+/**
+ * Set and/or get EC hibernation policy on S4/S5.
+ *
+ * @param set_enabled      Set EC hibernation policy on S4/S5. Passing value < 0
+ *                         makes the command act as a getter only.
+ * @param *out_cur_enabled Optional pointer to store retrieved current EC
+ *                         hibernation policy on S4/S5.
+ * @return                 0 on success, -1 on error.
+ */
+int google_chromeec_hib_ec_on_s4s5(int set_enabled, int *out_cur_enabled);
+#endif /* CHROMEEC_HIB_EC_ON_S4S5 */
+
 /**
  * Read bytes from the EMI.
  *

@@ -25,6 +25,10 @@
 #include <inttypes.h>
 #include <stddef.h>
 
+#if CONFIG(CHROMEEC_AFTER_G3_STATE)
+#include <intelblocks/pmclib.h>
+#endif
+
 #define CROS_EC_COMMAND_INFO const void
 #define CROS_EC_COMMAND(h, c, v, p, ps, r, rs)			\
 	google_chromeec_command(&(struct chromeec_command) {	\
@@ -438,6 +442,125 @@ static enum cb_err ec_sync(void)
 	return CB_SUCCESS;
 }
 
+static void ec_log_cmd_update_fail(const char *title, const char *cmd)
+{
+	printk(BIOS_WARNING, "%s: Update failed, either ChromeEC running image"
+			     " does not support %s, or there was an error\n",
+			title, cmd);
+}
+
+#if CONFIG(CHROMEEC_AFTER_G3_STATE)
+
+static void ec_after_g3_state_update(void)
+{
+	static const char *ag3s_title = "ChromeEC After G3 State";
+
+	enum ec_after_g3_state state;
+	const char *state_name;
+	unsigned int cfr_after_g3_state = get_uint_option("power_on_after_fail",
+			CONFIG_MAINBOARD_POWER_FAILURE_STATE);
+
+	switch (cfr_after_g3_state) {
+	case MAINBOARD_POWER_STATE_OFF:
+		state = EC_AFTER_G3_STATE_OFF;
+		state_name = "off";
+		break;
+	case MAINBOARD_POWER_STATE_ON:
+		state = EC_AFTER_G3_STATE_ON;
+		state_name = "on";
+		break;
+	case MAINBOARD_POWER_STATE_PREVIOUS:
+		state = EC_AFTER_G3_STATE_PREVIOUS;
+		state_name = "previous";
+		break;
+	default:
+		printk(BIOS_WARNING, "%s: Unknown CFR value: %u\n", ag3s_title,
+				cfr_after_g3_state);
+		return;
+	}
+
+	printk(BIOS_INFO, "%s: Updating to '%s'\n", ag3s_title, state_name);
+
+	if (google_chromeec_after_g3_state(state, NULL))
+		ec_log_cmd_update_fail(ag3s_title, "EC_CMD_AFTER_G3_STATE");
+}
+
+#endif /* CHROMEEC_AFTER_G3_STATE */
+
+#if CONFIG(CHROMEEC_LID_POWER_EVENTS)
+
+/* Order should match enum ec_lid_power_events_flags bit positions, starting
+ * from bit 0.
+ * Special flags are excluded.
+ */
+static const char *lidpe_flags_name_table[] = {
+	"no_open_auto_on",
+	"no_closed_ignore_pb"
+};
+
+static inline uint32_t lidpe_filter_valid_flags(uint32_t lpe_flags)
+{
+	return lpe_flags & ((1 << ARRAY_SIZE(lidpe_flags_name_table)) - 1);
+}
+
+static void lidpe_print_flags(int msg_level, uint32_t lpe_flags)
+{
+	int i, len;
+
+	for (i = 0, len = ARRAY_SIZE(lidpe_flags_name_table); i < len; ++i) {
+		if (i)
+			printk(msg_level, ", ");
+
+		printk(msg_level, "%s=%d", lidpe_flags_name_table[i],
+				!!(lpe_flags & (1 << i)));
+	}
+
+	printk(msg_level, "\n");
+}
+
+static void ec_lid_power_events_update(void)
+{
+	static const char *lidpe_title = "ChromeEC Lid Power Events";
+
+	uint32_t lpe_flags;
+	unsigned int lidpe_open_auto_on = get_uint_option(
+			"ec_lidpe_open_auto_on", 1);
+	unsigned int lidpe_closed_ignore_pb = get_uint_option(
+			"ec_lidpe_closed_ignore_pb", 1);
+
+	lpe_flags = EC_LID_POWER_EVENTS_DEFAULT;
+
+	if (!lidpe_open_auto_on)
+		lpe_flags |= EC_LID_POWER_EVENTS_NO_OPEN_AUTO_ON;
+
+	if (!lidpe_closed_ignore_pb)
+		lpe_flags |= EC_LID_POWER_EVENTS_NO_CLOSED_IGNORE_PB;
+
+	printk(BIOS_INFO, "%s: Updating to: ", lidpe_title);
+	lidpe_print_flags(BIOS_INFO, lidpe_filter_valid_flags(lpe_flags));
+
+	if (google_chromeec_lid_power_events(lpe_flags, NULL))
+		ec_log_cmd_update_fail(lidpe_title, "EC_CMD_POWER_LID_EVENTS");
+}
+
+#endif /* CHROMEEC_LID_POWER_EVENTS */
+
+#if CONFIG(CHROMEEC_HIB_EC_ON_S4S5)
+
+static void ec_hib_ec_on_s4s5_update(void)
+{
+	static const char *hibec_title = "ChromeEC Hibernate EC On S4/S5";
+
+	int cfr_hib_ec_on_s4s5 = !!get_uint_option("hib_ec_on_s4s5", 0);
+
+	printk(BIOS_INFO, "%s: Updating to '%d'\n", hibec_title,
+			cfr_hib_ec_on_s4s5);
+
+	if (google_chromeec_hib_ec_on_s4s5(cfr_hib_ec_on_s4s5, NULL))
+		ec_log_cmd_update_fail(hibec_title, "EC_CMD_HIB_EC_ON_S4S5");
+}
+
+#endif /* CHROMEEC_HIB_EC_ON_S4S5 */
 
 void google_chromeec_swsync(void)
 {
@@ -467,5 +590,16 @@ void google_chromeec_swsync(void)
 			chromeec_get_and_print_ec_version();
 		}
 	}
+
+	/* Update EC configuration via custom EC commands. */
+#if CONFIG(CHROMEEC_AFTER_G3_STATE)
+	ec_after_g3_state_update();
+#endif
+#if CONFIG(CHROMEEC_LID_POWER_EVENTS)
+	ec_lid_power_events_update();
+#endif
+#if CONFIG(CHROMEEC_HIB_EC_ON_S4S5)
+	ec_hib_ec_on_s4s5_update();
+#endif
 }
 

@@ -98,4 +98,53 @@ static const struct sm_object ec_rgb_kb_color = SM_DECLARE_ENUM({
 	.values         = ec_rgb_backlight_values,
 }, WITH_CALLBACK(update_rgb_kb_backlight));
 
+#if CONFIG(CHROMEEC_LID_POWER_EVENTS)
+
+static const struct sm_object ec_lidpe_open_auto_on = SM_DECLARE_ENUM({
+	.opt_name	= "ec_lidpe_open_auto_on",
+	.ui_name	= "EC Lid Open Auto Power On",
+	.ui_helptext	= "Allows to disable EC auto powering up device when"
+			  " user opens lid.",
+	.default_value	= 1,
+	.values		= (const struct sm_enum_value[]) {
+				{ "Disabled", 0 },
+				{ "Default",  1 },
+				SM_ENUM_VALUE_END },
+});
+
+static const struct sm_object ec_lidpe_closed_ignore_pb = SM_DECLARE_ENUM({
+	.opt_name	= "ec_lidpe_closed_ignore_pb",
+	.ui_name	= "EC Lid Closed Ignore Power Button",
+	.ui_helptext	= "Allows to disable EC ignoring power button while lid"
+			  " is closed.",
+	.default_value	= 1,
+	.values		= (const struct sm_enum_value[]) {
+				{ "Disabled", 0 },
+				{ "Default",  1 },
+				SM_ENUM_VALUE_END },
+});
+
+#endif /* CHROMEEC_LID_POWER_EVENTS */
+
+#if CONFIG(CHROMEEC_HIB_EC_ON_S4S5)
+
+static const struct sm_object ec_hib_on_s4s5 = SM_DECLARE_ENUM({
+	.opt_name	= "ec_hib_on_s4s5",
+	.ui_name	= "EC Hibernate On S4/S5",
+	.ui_helptext	= "Allows to enable forced EC hibernation on S4"
+			  " (suspend to disk) and S5 (device off), which can"
+			  " reduce battery usage when device remains off."
+			  " Hibernation is put on hold while external power is"
+			  " plugged. WARNING: Enabling this option can break"
+			  " lid/power events while EC is hibernated. Waking up"
+			  " EC will always auto power up device.",
+	.default_value	= 0,
+	.values		= (const struct sm_enum_value[]) {
+				{ "Default", 0 },
+				{ "Enabled", 1 },
+				SM_ENUM_VALUE_END },
+});
+
+#endif /* CHROMEEC_HIB_EC_ON_S4S5 */
+
 #endif /* CHROMEEC_CFR_H */

@@ -258,6 +258,7 @@ static inline int ec_cmd_fp_template(CROS_EC_COMMAND_INFO *h,
 
 _CROS_EC_C0_F_PF_RF(EC_CMD_ADC_READ, adc_read);
 _CROS_EC_CV_F_P(EC_CMD_ADD_ENTROPY, 0, add_entropy, rollback_add_entropy);
+_CROS_EC_C0_F_PF_RF(EC_CMD_AFTER_G3_STATE, after_g3_state);
 _CROS_EC_C0_F_PF(EC_CMD_AP_FW_STATE, ap_fw_state);
 _CROS_EC_C0_F(EC_CMD_AP_RESET, ap_reset);
 _CROS_EC_C0_F(EC_CMD_AP_SHUTDOWN, ap_shutdown);
@@ -333,6 +334,7 @@ _CROS_EC_CV_F_P_R(EC_CMD_GSV_PAUSE_IN_S5, 0, gsv_pause_in_s5, get_set_value,
 		  get_set_value);
 _CROS_EC_C0_F_PF_RF(EC_CMD_HANG_DETECT, hang_detect);
 _CROS_EC_C0_F_PF_RF(EC_CMD_HELLO, hello);
+_CROS_EC_C0_F_PF_RF(EC_CMD_HIB_EC_ON_S4S5, hib_ec_on_s4s5);
 _CROS_EC_C0_F_PF_RF(EC_CMD_HIBERNATION_DELAY, hibernation_delay);
 _CROS_EC_C0_F_PF_RF(EC_CMD_HOST_EVENT, host_event);
 _CROS_EC_CV_F_P(EC_CMD_HOST_EVENT_CLEAR, 0, host_event_clear, host_event_mask);
@@ -358,6 +360,7 @@ _CROS_EC_C0_F_PF_RF(EC_CMD_I2C_PASSTHRU_PROTECT, i2c_passthru_protect);
 _CROS_EC_C0_F_RF(EC_CMD_KEYBOARD_FACTORY_TEST, keyboard_factory_test);
 _CROS_EC_CV_F_P_R(EC_CMD_LED_CONTROL, 1, led_control_v1, led_control,
 		  led_control);
+_CROS_EC_C0_F_PF_RF(EC_CMD_LID_POWER_EVENTS, lid_power_events);
 _CROS_EC_C0_F_PF_RF(EC_CMD_LOCATE_CHIP, locate_chip);
 _CROS_EC_C0_F_RF(EC_CMD_MKBP_GET_CONFIG, mkbp_get_config);
 _CROS_EC_C0_F_PF_RF(EC_CMD_MKBP_INFO, mkbp_info);

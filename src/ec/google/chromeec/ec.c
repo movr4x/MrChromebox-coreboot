@@ -1868,6 +1868,65 @@ bool google_chromeec_is_battery_present(void)
 	return false;
 }
 
+#if CONFIG(CHROMEEC_AFTER_G3_STATE)
+int google_chromeec_after_g3_state(enum ec_after_g3_state set_state,
+		enum ec_after_g3_state *out_cur_state)
+{
+	const struct ec_params_after_g3_state params = {
+		.set_state = (uint8_t)set_state
+	};
+	struct ec_response_after_g3_state resp = {};
+
+	int rv = ec_cmd_after_g3_state(PLAT_EC, &params, &resp);
+	if (rv != 0 || resp.cur_state == EC_AFTER_G3_STATE_ERROR)
+		return -1;
+
+	if (out_cur_state)
+		*out_cur_state = resp.cur_state;
+
+	return 0;
+}
+#endif /* CHROMEEC_AFTER_G3_STATE */
+
+#if CONFIG(CHROMEEC_LID_POWER_EVENTS)
+int google_chromeec_lid_power_events(uint32_t set_lpe_flags,
+		uint32_t *out_cur_lpe_flags)
+{
+	const struct ec_params_lid_power_events params = {
+		.set_lpe_flags = set_lpe_flags
+	};
+	struct ec_response_lid_power_events resp = {};
+
+	int rv = ec_cmd_lid_power_events(PLAT_EC, &params, &resp);
+	if (rv != 0 || (resp.cur_lpe_flags & EC_LID_POWER_EVENTS_ERROR))
+		return -1;
+
+	if (out_cur_lpe_flags)
+		*out_cur_lpe_flags = resp.cur_lpe_flags;
+
+	return 0;
+}
+#endif /* CHROMEEC_LID_POWER_EVENTS */
+
+#if CONFIG(CHROMEEC_HIB_EC_ON_S4S5)
+int google_chromeec_hib_ec_on_s4s5(int set_enabled, int *out_cur_enabled)
+{
+	const struct ec_params_hib_ec_on_s4s5 params = {
+		.set_enabled = (int8_t)set_enabled
+	};
+	struct ec_response_hib_ec_on_s4s5 resp = {};
+
+	int rv = ec_cmd_hib_ec_on_s4s5(PLAT_EC, &params, &resp);
+	if (rv != 0 || resp.cur_enabled < 0)
+		return -1;
+
+	if (out_cur_enabled)
+		*out_cur_enabled = resp.cur_enabled;
+
+	return 0;
+}
+#endif /* CHROMEEC_HIB_EC_ON_S4S5 */
+
 /*
  * Performs early power off.
  *
