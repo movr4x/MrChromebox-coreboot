@@ -44,3 +44,6 @@ tarballs/
 *~
 *.kate-swp
 *.kdev4
+
+# Allow debug binaries.
+!3rdparty/blobs-movr4x/**/*.bin
